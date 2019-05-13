@@ -16,7 +16,7 @@ class UserLoginMiddleware(MiddlewareMixin):
         no_need_check_path_list = ['/user/register/', '/user/login/', '/goods/index/', '/media/(.*)/', '/static/(.*)/',
                                    '/goods/detail/(\d+)/', '/goods/goods_list/(\d+)/', '/cart/cart/',
                                    '/cart/add_cart/(\d+)/', '/cart/add_goods/(\d+)/', '/cart/minus_goods/(\d+)/',
-                                   '/cart/del_goods/(\d+)/',
+                                   '/cart/del_goods/(\d+)/', '/goods/search/', '/user/is_login/',
                                    ]
         for no_path in no_need_check_path_list:
             if re.match(no_path, path):

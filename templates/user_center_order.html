@@ -14,6 +14,28 @@
         </div>
     </div>
 
+    <script>
+        $('.input_btn').click(function () {
+            var keywords = $('.input_text').val();
+            $.ajax({
+                type: 'post',
+                url: '/goods/search/' + keywords + '/',
+                async: true,
+                data: {'keywords': keywords},
+                success: function (data) {
+                    if (data['url'] == '') {
+                        alert('没这个东西')
+                    } else {
+                        window.location.href = data['url']
+                    }
+                },
+                error: function () {
+                    alert('请输入要所搜的商品')
+                }
+            })
+        })
+    </script>
+
     <div class="main_con clearfix">
         <div class="left_menu_con clearfix">
             <h3>用户中心</h3>

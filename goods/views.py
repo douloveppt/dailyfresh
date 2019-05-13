@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import JsonResponse
 from django.shortcuts import render
 
 from goods.models import GoodsCategory, Goods
@@ -26,6 +27,19 @@ def goods_list(request, id):
         category = GoodsCategory.objects.filter(pk=id).first()
         goods = Goods.objects.filter(category=id).all()
         p = Paginator(goods, 2)
-        goods =p.page(page)
+        goods = p.page(page)
         res = {'category': category, 'goods': goods}
         return render(request, 'list.html', res)
+
+
+def search(request, keywords):
+    print(keywords)
+    if request.is_ajax():
+        print(keywords)
+        if not keywords:
+            return JsonResponse({'url': 'http://127.0.0.1:8000/goods/indedx/'})
+        good = Goods.objects.filter(name__contains=keywords).first()
+        if not good:
+            return JsonResponse({'url': ''})
+        good_id = good.id
+        return JsonResponse({'url': 'http://127.0.0.1:8000/goods/detail/%s/' % good_id})

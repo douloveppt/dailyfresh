@@ -9,10 +9,32 @@
         <a href="{% url 'goods:index' %}" class="logo fl"><img src="/static/images/logo.png"></a>
         <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
         <div class="search_con fr">
-            <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+            <input type="text" class="input_text fl" name="keywords" placeholder="搜索商品">
             <input type="button" class="input_btn fr" name="" value="搜索">
         </div>
     </div>
+
+    <script>
+        $('.input_btn').click(function () {
+            var keywords = $('.input_text').val();
+            $.ajax({
+                type: 'post',
+                url: '/goods/search/' + keywords + '/',
+                async: true,
+                data: {'keywords': keywords},
+                success: function (data) {
+                    if (data['url'] == '') {
+                        alert('没这个东西')
+                    } else {
+                        window.location.href = data['url']
+                    }
+                },
+                error: function () {
+                    alert('请输入要所搜的商品')
+                }
+            })
+        })
+    </script>
 
     <div class="total_count">全部商品<em></em>件</div>
     <ul class="cart_list_th clearfix">
