@@ -1,0 +1,116 @@
+{% extends 'base_main.html' %}
+
+{% block title %}
+    <title>天天生鲜-购物车</title>
+{% endblock %}
+
+{% block body %}
+    <div class="search_bar clearfix">
+        <a href="{% url 'goods:index' %}" class="logo fl"><img src="/static/images/logo.png"></a>
+        <div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;购物车</div>
+        <div class="search_con fr">
+            <input type="text" class="input_text fl" name="" placeholder="搜索商品">
+            <input type="button" class="input_btn fr" name="" value="搜索">
+        </div>
+    </div>
+
+    <div class="total_count">全部商品<em></em>件</div>
+    <ul class="cart_list_th clearfix">
+        <li class="col01">商品名称</li>
+        <li class="col02">商品单位</li>
+        <li class="col03">商品价格</li>
+        <li class="col04">数量</li>
+        <li class="col05">小计</li>
+        <li class="col06">操作</li>
+    </ul>
+
+    {% load goods_filter %}
+    {% for gs in  goods_sessions %}
+        <ul class="cart_list_td clearfix">
+            <li class="col01"><input type="checkbox" name="" {% if gs.2 == '1' %}checked{% endif %}></li>
+            <li class="col02"><img src="/media/{{ goods|goods_filter:gs.0|first }}"></li>
+            <li class="col03">{{ goods|goods_filter:gs.0|slice:"1:2"|first }}<br><em>{{ goods|goods_filter:gs.0|last }}元/500g</em>
+            </li>
+            <li class="col04">500g</li>
+            <li class="col05">{{ goods|goods_filter:gs.0|last }}元</li>
+            <li class="col06">
+                <div class="num_add">
+                    <a href="javascript:;" class="add fl" id="add{{ gs.0 }}">+</a>
+                    <input type="text" class="num_show fl" value="{{ gs|slice:"1:2"|first }}">
+                    <a href="javascript:;" class="minus fl" id="minus{{ gs.0 }}">-</a>
+                </div>
+                <script>
+                    $('#add{{ gs.0 }}').click(function () {
+                        $.ajax({
+                            type: 'post',
+                            url: '/cart/add_goods/{{ gs.0 }}/',
+                            async: true,
+                            data: {'id': {{ gs.0 }}},
+                            success: function (data) {
+                                $(this).parent().children('input').val(data['data']);
+                                window.location.reload()
+                            },
+                            error: function () {
+                                alert('获取数据失败')
+                            }
+                        })
+                    });
+                    $('#minus{{ gs.0 }}').click(function () {
+                        $.ajax({
+                            type: 'post',
+                            url: '/cart/minus_goods/{{ gs.0 }}/',
+                            async: true,
+                            data: {'id': {{ gs.0 }}},
+                            success: function (data) {
+                                $(this).parent().children('input').val(data['data']);
+                                window.location.reload()
+                            },
+                            error: function () {
+                                alert('获取数据失败')
+                            }
+                        })
+                    });
+                </script>
+            </li>
+            <li class="col07">{% widthratio goods|goods_filter:gs.0|last 1 gs|slice:"1:2"|first %}元</li>
+            <li class="col08"><a href="javascript:;" id="del{{ gs.0 }}">删除</a></li>
+        </ul>
+        <script>
+            $('#del{{ gs.0 }}').click(function () {
+                $.ajax({
+                    type: 'post',
+                    url: '/cart/del_goods/{{ gs.0 }}/',
+                    async: true,
+                    data: {'id': {{ gs.0 }}},
+                    success: function (data) {
+                        window.location.reload()
+                    },
+                    error: function () {
+                        alert('获取数据失败')
+                    }
+                })
+            })
+        </script>
+    {% endfor %}
+
+    <ul class="settlements">
+        <li class="col01"><input type="checkbox" name=""></li>
+        <li class="col02">全选</li>
+        <li class="col03">合计(不含运费)：<span>¥</span><em></em><br>共计<b></b>件商品</li>
+        <li class="col04"><a href="{% url 'order:order' %}">去结算</a></li>
+    </ul>
+    <script>
+        var sum = 0;
+        var num = 0;
+        $('.col07').each(function () {
+            var text = $(this).text();
+            text = text.substring(0, text.length - 1);
+            var n = $(this).prev().children('div').children('input').val();
+            sum = sum + parseInt(text);
+            num = num + parseInt(n);
+        });
+        $('.col03>em').last().append(sum);
+        $('.col03>b').last().append(num);
+        $('.total_count>em').append(num)
+    </script>
+{% endblock %}
